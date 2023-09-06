@@ -33,7 +33,7 @@ return [
 
     // When using the getUpdates method, this can be commented out
     'webhook'      => [
-        'url' => 'https://531d-46-138-69-3.ngrok-free.app/bottlg/example-bot/hook.php',
+        'url' => 'https://tequila.team/bots/ttrjobbot/hook.php',
         // Use self-signed certificate
         // 'certificate'     => __DIR__ . '/path/to/your/certificate.crt',
         // Limit maximum number of connections
