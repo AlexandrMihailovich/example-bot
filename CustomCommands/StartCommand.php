@@ -427,11 +427,11 @@ class StartCommand extends UserCommand
                 $this->conversation->stop();
 
                 $toAdmin['chat_id'] = 2137909128; // id админа которому будет отправленно
-                $toGroup['chat_id'] = -945423465; // id группы в которую будет отправленно
+                $toGroup['chat_id'] = -1001581737547; // id группы в которую будет отправленно
                 // $result = Request::emptyResponse();
                 if ($noPhoto) {
-                    Request::sendMessage($toAdmin);
-                    // Request::sendMessage($toGroup);
+                    // Request::sendMessage($toAdmin);
+                    Request::sendMessage($toGroup);
                     $result = Request::sendMessage($data);
                 } else {
                     // $result = Request::sendPhoto($data);
@@ -452,8 +452,8 @@ class StartCommand extends UserCommand
                     $toAdmin['media'][0]['caption'] = $out_text;
 
 
-                    Request::sendMediaGroup($toAdmin);
-                    // Request::sendMediaGroup($toGroup);
+                    // Request::sendMediaGroup($toAdmin);
+                    Request::sendMediaGroup($toGroup);
 
 
                     $result = Request::sendMediaGroup($data);
