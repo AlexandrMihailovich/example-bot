@@ -77,6 +77,9 @@ class CallbackqueryCommand extends SystemCommand
         // $user_id = $user->getId();
 
         $this->conversation = new Conversation($chat_id, $chat_id, 'start');
+        // Load any existing notes from this conversation
+        $notes = &$this->conversation->notes;
+        $state = $notes['state'] ?? 0;
 
         $result = Request::emptyResponse();
         $data = [
@@ -103,10 +106,72 @@ class CallbackqueryCommand extends SystemCommand
             ]);
             return $result;
         }
+        if ('set_status_success' === $callback_data) {
 
-        // Load any existing notes from this conversation
-        $notes = &$this->conversation->notes;
-        $state = $notes['state'] ?? 0;
+            $code = array_values(array_filter($message->getEntities(), function($item) {
+                if($item->type === 'code') return true;
+                return false;
+            }))[0];
+            $arr = mb_str_split($message->getText());
+            $parsed_id = intval(implode('', array_slice($arr, $code->getOffset(), $code->getLength())));
+
+            $this->conversation = new Conversation($parsed_id, $parsed_id, 'start');
+            $notes = &$this->conversation->notes;
+
+            $result = Request::editMessageText([
+                'chat_id'    => $chat_id,
+                'message_id' => $message->getMessageId(),
+                'text'       => $message->getText() . PHP_EOL . PHP_EOL . '✅ Принято',
+                'entities'   => $message->getEntities()
+            ]);
+            $notes['status'] = 'SUCCESS';
+
+            $result = Request::sendMessage([
+                'chat_id'      => $notes['user_id'],
+                'reply_markup' => Keyboard::remove(['selective' => true]),
+                'text'       => '✅ Статус анкеты: Здравствуйте 😻 Ваша анкета была рассмотрена и принята. В ближайшее время менеджер с вами свяжется ☺️ Добро пожаловать в команду 🤗'
+            ]);
+
+            $this->conversation->update();
+            $this->conversation->stop();
+
+            return $result;
+        }
+        if ('set_status_fail' === $callback_data) {
+            $code = array_values(array_filter($message->getEntities(), function($item) {
+                if($item->type === 'code') return true;
+                return false;
+            }))[0];
+            $arr = mb_str_split($message->getText());
+            $parsed_id = intval(implode('', array_slice($arr, $code->getOffset(), $code->getLength())));
+
+            $arr = mb_str_split($message->getText());
+            $parsed_id = intval(implode('', array_slice($arr, $message->getEntities()['3']->getOffset(), $message->getEntities()['3']->getLength())));
+
+            $this->conversation = new Conversation($parsed_id, $parsed_id, 'start');
+            $notes = &$this->conversation->notes;
+
+            $result = Request::editMessageText([
+                'chat_id'    => $chat_id,
+                'message_id' => $message->getMessageId(),
+                'text'       => $message->getText() . PHP_EOL . PHP_EOL . '⛔️ Отказано',
+                'entities'   => $message->getEntities()
+            ]);
+            $notes['status'] = 'FAIL';
+
+            $result = Request::sendMessage([
+                'chat_id'      => $notes['user_id'],
+                'reply_markup' => Keyboard::remove(['selective' => true]),
+                'text'       => '⛔️ Статус анкеты: Здравствуйте 👋 Ваша анкета была рассмотрена и к сожалению, отклонена по действующим причинам компании Tequila Team Russia. Спасибо, что проявили интерес. Всех благ 🙌'
+            ]);
+
+            $this->conversation->update();
+            $this->conversation->stop();
+
+            return $result;
+        }
+
+
         if ($state === 0) {
             $positions = getPositionsArray();
             if ('complete_position' !== $callback_data) {
@@ -144,8 +209,8 @@ class CallbackqueryCommand extends SystemCommand
             $result = Request::editMessageText([
                 'chat_id'    => $chat_id,
                 'message_id' => $message->getMessageId(),
-                'text'       => $text, 
-                'reply_markup' => new InlineKeyboard(...$positions) 
+                'text'       => $text,
+                'reply_markup' => new InlineKeyboard(...$positions)
             ]);
         }
 

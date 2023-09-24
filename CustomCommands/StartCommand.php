@@ -31,6 +31,8 @@ use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 // use Longman\TelegramBot\;
 
+const ADMIN_ID = 825629421; //2137909128;
+const GROUP_ID = -945423465; //-1001581737547;
 
 class StartCommand extends UserCommand
 {
@@ -120,12 +122,17 @@ class StartCommand extends UserCommand
 
         $result = Request::emptyResponse();
 
+        $notes['status'] = 'IN_EDIT';
+        $notes['chat_id'] = $chat_id;
+        $notes['user_id'] = $user_id;
+
         // State machine
         // Every time a step is achieved the state is updated
         switch ($state) {
             case 0:
                 if ($text === '') {
                     $notes['state'] = 0;
+
                     $this->conversation->update();
 
                     $data['text'] = getTextValue('state_0', ['user_name' => $user_name]);
@@ -376,6 +383,23 @@ class StartCommand extends UserCommand
                 $notes['vk'] = $text;
                 $text             = '';
             case 12:
+                // employment
+                if ($text === '') {
+                    $notes['state'] = 12;
+                    $this->conversation->update();
+
+                    $data['text'] = getTextValue('state_12');
+
+                    $result = Request::sendMessage($data);
+                    break;
+                }
+
+                $notes['whatsapp'] = $text;
+                $text             = '';
+            case 13:
+                $notes['status'] = 'SENDED';
+                $notes['state'] = 14;
+
                 $this->conversation->update();
 
 
@@ -424,14 +448,26 @@ class StartCommand extends UserCommand
                     $toAdmin['caption'] = $out_text;
                 }
 
-                $this->conversation->stop();
+                // $this->conversation->stop();
 
-                $toAdmin['chat_id'] = 2137909128; // id админа которому будет отправленно
-                $toGroup['chat_id'] = -1001581737547; // id группы в которую будет отправленно
+                $toAdmin['chat_id'] = ADMIN_ID; // id админа которому будет отправленно
+                $toGroup['chat_id'] = GROUP_ID; // id группы в которую будет отправленно
+
                 // $result = Request::emptyResponse();
                 if ($noPhoto) {
+
+                    $toGroup['reply_markup'] = new InlineKeyboard([
+                        [
+                            'text' => 'Принять',
+                            'callback_data' => 'set_status_success'
+                        ],
+                        [
+                            'text' => 'Отклонить',
+                            'callback_data' => 'set_status_fail'
+                        ],
+                    ]);
                     // Request::sendMessage($toAdmin);
-                    Request::sendMessage($toGroup);
+                    $toGroupResult = Request::sendMessage($toGroup);
                     $result = Request::sendMessage($data);
                 } else {
                     // $result = Request::sendPhoto($data);
@@ -452,12 +488,34 @@ class StartCommand extends UserCommand
                     $toAdmin['media'][0]['caption'] = $out_text;
 
 
-                    // Request::sendMediaGroup($toAdmin);
                     Request::sendMediaGroup($toGroup);
+                    Request::sendMessage([
+                        'chat_id'      => GROUP_ID,
+                        'parse_mode' => 'html',
+                        'reply_markup' => new InlineKeyboard([
+                            [
+                                'text' => 'Принять',
+                                'callback_data' => 'set_status_success'
+                            ],
+                            [
+                                'text' => 'Отклонить',
+                                'callback_data' => 'set_status_fail'
+                            ],
+                        ]),
+                        'text' => 'Действие для:' . PHP_EOL .
+                            PHP_EOL . '<b>Пользователь:</b> @' . $user_name . PHP_EOL .
+                            '<b>ID Пользователя:</b> <code>' . $user_id . '</code>' . PHP_EOL,
+                    ]);
+                    // Request::sendMediaGroup($toAdmin);
+
 
 
                     $result = Request::sendMediaGroup($data);
                 }
+                break;
+            case 14:
+                $data['text'] = getTextValue('state_14');
+                $result = Request::sendMessage($data);
                 break;
         }
 

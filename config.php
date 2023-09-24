@@ -25,15 +25,15 @@
 
 return [
     // Add you bot's API key and name
-    'api_key'      => '6404497101:AAH7OOdBZf4DNOCQX-3bFVKrfwU4sKSOfnU',
-    'bot_username' => 'tequilateamjobbot', // Without "@"
+    'api_key'      => '5745070571:AAHAwl6-OLwrJ1y9oTwpL8-oeaHQ9p28gKg',
+    'bot_username' => 'testtlgsapi2141_bot', // Without "@"
 
     // [Manager Only] Secret key required to access the webhook
     'secret'       => 'super_secret',
 
     // When using the getUpdates method, this can be commented out
     'webhook'      => [
-        'url' => 'https://tequila.team/bots/ttrjobbot/hook.php',
+        'url' => 'https://08a0-46-138-69-3.ngrok-free.app/bottlg/example-bot/hook.php',
         // Use self-signed certificate
         // 'certificate'     => __DIR__ . '/path/to/your/certificate.crt',
         // Limit maximum number of connections

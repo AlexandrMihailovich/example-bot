@@ -43,6 +43,10 @@ function getTextsArray()
 
         'state_11' => '🔥 ссылка на ВКонтакте(vk.com):',
 
+        'state_12' => '🔥 Напишите ваш WhatsApp для связи:',
+
+        'state_14' => '🟢 Ваша заявка на рассмотрение',
+
         'output' => 'Входящая заявка:' . PHP_EOL .
             PHP_EOL . '<b>Пользователь:</b> @user_name' . PHP_EOL .
             '<b>ID Пользователя:</b> <code>user_id</code>' . PHP_EOL .
@@ -57,7 +61,11 @@ function getTextsArray()
             PHP_EOL . '✅ <b>Опыт работы:</b> experience' .
             PHP_EOL . '✅ <b>Занятость:</b> employment' .
             PHP_EOL . '✅ <b>Ищу:</b> sidejob' .
-            PHP_EOL . '✅ <b>VK:</b> vk',
+            PHP_EOL . '✅ <b>VK:</b> vk' .
+            PHP_EOL . '✅ <b>WhatsApp:</b> whatsapp' .
+
+            PHP_EOL . '',
+
 
         'output_user' => 'Отлично 👍 ваша анкета отправлена.' . PHP_EOL .
 
@@ -72,6 +80,7 @@ function getTextsArray()
             PHP_EOL . '✅ <b>Занятость:</b> employment' .
             PHP_EOL . '✅ <b>Ищу:</b> sidejob' .
             PHP_EOL . '✅ <b>VK:</b> vk' .
+            PHP_EOL . '✅ <b>WhatsApp:</b> whatsapp' .
             // PHP_EOL . '' .
             PHP_EOL . '',
 
